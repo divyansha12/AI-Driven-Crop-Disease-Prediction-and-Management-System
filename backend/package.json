@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "node --test test/*.test.js",
-    "prisma:generate": "prisma generate",
-    "prisma:validate": "prisma validate"
-  },
+"scripts": {
+  "start": "node src/server.js",
+  "dev": "node --watch src/server.js",
+  "test": "node --test test/*.test.js",
+  "prisma:generate": "prisma generate",
+  "prisma:validate": "prisma validate"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
