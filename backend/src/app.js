@@ -45,6 +45,7 @@ app.use("/api/users", profileRoutes);
 app.use("/api/farms", farmRoutes);
 app.use("/api/recommendations", recommendationRoutes);
 app.use("/api/feedback", feedbackRoutes);
+app.use("/api/preventions", preventionRoutes);
 
 app.get("/", (req, res) => {
     res.json({
