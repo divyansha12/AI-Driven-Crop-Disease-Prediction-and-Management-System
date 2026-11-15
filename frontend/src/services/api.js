@@ -1,6 +1,5 @@
 
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+const API_URL = import.meta.env.VITE_API_URL || "https://ai-driven-crop-disease-prediction-and-eeq3.onrender.com/api";
 
 export const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL ||
