@@ -32,12 +32,13 @@ function parseOptionalCropId(value) {
   return cropId;
 }
 
-function predictionResponse(prediction) {
+function predictionResponse(prediction, predictionSource) {
   return {
     id: prediction.id,
     confidence: prediction.confidence,
     createdAt: prediction.createdAt,
     cropId: prediction.cropId,
+    ...(predictionSource ? { predictionSource } : {}),
     image: {
       id: prediction.image.id,
       url: prediction.image.url,
@@ -84,7 +85,7 @@ exports.createPrediction = async (req, res, next) => {
       },
     });
 
-    return res.status(201).json(predictionResponse(prediction));
+    return res.status(201).json(predictionResponse(prediction, result.predictionSource));
   } catch (error) {
     try {
       await removeImageRecord(image, req.file);

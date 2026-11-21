@@ -4,8 +4,14 @@ import ConfidenceBadge from "./ConfidenceBadge";
 export default function PredictionCard({ prediction, onDownload }) {
   const disease = prediction?.disease;
   const healthy = Boolean(disease?.isHealthy);
+  const mockPrediction = prediction?.predictionSource === "mock";
   return (
     <div className={`person1-result-card ${healthy ? "person1-healthy" : "person1-diseased"}`}>
+      {mockPrediction && (
+        <div className="alert error" role="status">
+          Development mock prediction — not a real AI model result.
+        </div>
+      )}
       <div className="person1-result-heading">
         <div>
           <span className="crop-tag">{disease?.cropName || "Crop"}</span>

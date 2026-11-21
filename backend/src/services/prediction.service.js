@@ -33,5 +33,10 @@ exports.runPrediction = async (imageRecord) => {
     throw error;
   }
 
-  return { disease, confidence, rawLabel: label };
+  return {
+    disease,
+    confidence,
+    rawLabel: label,
+    predictionSource: ai.MODE === "real" ? "real" : "mock",
+  };
 };

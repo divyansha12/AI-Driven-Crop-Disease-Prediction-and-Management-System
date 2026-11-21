@@ -54,6 +54,10 @@ app.get("/", (req, res) => {
     });
 });
 
+app.get("/healthz", (req, res) => {
+    res.json({ status: "ok" });
+});
+
 app.use(errorMiddleware);
 
 module.exports = app;

@@ -6,6 +6,7 @@ const labels = diseases.map((disease) => disease.name);
 const mlServiceUrl = process.env.ML_SERVICE_URL?.replace(/\/+$/, "");
 const isDevelopment = process.env.NODE_ENV !== "production";
 const allowMockFallback = process.env.ML_MOCK_FALLBACK !== "false";
+const aiServiceTimeoutMs = Number(process.env.ML_SERVICE_TIMEOUT_MS) || 15000;
 
 async function mockPredict(imagePath) {
   let image;
@@ -48,13 +49,21 @@ async function realPredict(imagePath) {
   form.append("image", new Blob([image]), "image");
 
   let response;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), aiServiceTimeoutMs);
   try {
     response = await fetch(`${mlServiceUrl}/predict`, {
       method: "POST",
       body: form,
+      signal: controller.signal,
     });
   } catch (error) {
+    if (error.name === "AbortError") {
+      throw predictionError("AI service timed out");
+    }
     throw predictionError("AI service is unavailable", error);
+  } finally {
+    clearTimeout(timeout);
   }
 
   let body;
@@ -84,6 +93,12 @@ async function realPredict(imagePath) {
 
 exports.predict = async (imagePath) => {
   if (!mlServiceUrl) {
+    if (!isDevelopment) {
+      throw predictionError("AI service is not configured");
+    }
+    if (!allowMockFallback) {
+      throw predictionError("Real AI service is not configured");
+    }
     exports.MODE = "mock";
     return mockPredict(imagePath);
   }
