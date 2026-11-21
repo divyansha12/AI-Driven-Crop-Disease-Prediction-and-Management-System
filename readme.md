@@ -419,6 +419,12 @@ A formal open-source license can be added when selected by the project team.
 
 **Built with 🌱 for smarter and more sustainable agriculture.**
 
+## Data Engineering Documentation
+
+The separate [`DE/`](DE/) folder contains the database justification, ER diagram,
+normalization, final schema summary, executed SQL evidence, backend integration,
+architecture, and verified limitations.
+
 ## Member B: AI prediction module
 
 Member B owns the disease catalogue, protected image upload, prediction
