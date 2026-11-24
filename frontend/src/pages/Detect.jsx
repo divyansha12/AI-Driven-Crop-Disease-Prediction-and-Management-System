@@ -69,6 +69,11 @@ export default function Detect() {
           {result ? (
             <>
               <p className="eyebrow">Prediction result</p>
+              {result.predictionSource === "mock" && (
+                <Alert>
+                  Demo prediction: a trained ML model is not connected yet. Do not use this result for real crop decisions.
+                </Alert>
+              )}
               <PredictionCard prediction={result} onDownload={downloadReport} />
               <Link className="text-link" to="/app/history">View in history →</Link>
             </>

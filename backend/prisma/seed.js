@@ -1,10 +1,8 @@
 // Seeds the Disease table. Run with: node prisma/seed.js  (from the backend folder)
 // Uses upsert so it is safe to run multiple times.
 
-const { PrismaClient } = require("@prisma/client");
 const diseases = require("./data/diseases");
-
-const prisma = new PrismaClient();
+const prisma = require("../src/config/database");
 
 async function main() {
   for (const disease of diseases) {
