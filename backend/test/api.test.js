@@ -31,6 +31,7 @@ function request(server, path, options = {}) {
       headers: {
         ...(body ? { "content-type": "application/json", "content-length": Buffer.byteLength(body) } : {}),
         ...(options.token ? { authorization: `Bearer ${options.token}` } : {}),
+        ...options.headers,
       },
     }, (res) => {
       let responseBody = "";
@@ -38,6 +39,7 @@ function request(server, path, options = {}) {
       res.on("end", () => resolve({
         status: res.statusCode,
         body: responseBody ? JSON.parse(responseBody) : null,
+        headers: res.headers,
       }));
     });
     req.on("error", reject);
@@ -123,6 +125,16 @@ test("logs in successfully and rejects incorrect credentials generically", async
   });
   assert.equal(failure.status, 401);
   assert.equal(failure.body.error, "Invalid email or password");
+});
+
+test("allows requests from the deployed frontend", async () => {
+  const origin = "https://ai-driven-crop-disease-prediction-a.vercel.app";
+  const response = await request(global.testServer, "/healthz", {
+    headers: { origin },
+  });
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers["access-control-allow-origin"], origin);
 });
 
 test("protects current-user and profile endpoints", async () => {
