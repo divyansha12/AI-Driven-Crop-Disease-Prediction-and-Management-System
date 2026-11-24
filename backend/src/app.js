@@ -6,10 +6,17 @@ const path = require("path");
 const cors = require("cors");
 const app = express();
 
-const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173,http://127.0.0.1:5173")
+const defaultOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://ai-driven-crop-disease-prediction-a.vercel.app",
+  "https://leafwise-l15r.vercel.app",
+];
+const configuredOrigins = (process.env.CORS_ORIGIN || "")
   .split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
+const allowedOrigins = [...new Set([...defaultOrigins, ...configuredOrigins])];
 const treatmentRoutes = require("./routes/treatment.routes");
 const diseaseRoutes = require("./routes/disease.routes");
 const imageRoutes = require("./routes/image.routes");
