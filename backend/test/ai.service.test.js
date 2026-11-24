@@ -4,7 +4,7 @@ const os = require("node:os");
 const path = require("node:path");
 const test = require("node:test");
 
-test("does not use mock predictions when the service is unconfigured in production", async () => {
+test("does not use mock predictions unless fallback is explicitly enabled", async () => {
   const previous = {
     NODE_ENV: process.env.NODE_ENV,
     ML_SERVICE_URL: process.env.ML_SERVICE_URL,
@@ -12,7 +12,7 @@ test("does not use mock predictions when the service is unconfigured in producti
   };
   process.env.NODE_ENV = "production";
   delete process.env.ML_SERVICE_URL;
-  process.env.ML_MOCK_FALLBACK = "true";
+  process.env.ML_MOCK_FALLBACK = "false";
 
   const aiPath = require.resolve("../src/services/ai.service");
   delete require.cache[aiPath];
@@ -27,6 +27,38 @@ test("does not use mock predictions when the service is unconfigured in producti
       if (value === undefined) delete process.env[key];
       else process.env[key] = value;
     }
+  }
+});
+
+test("uses a clearly identified mock prediction when fallback is enabled", async () => {
+  const previous = {
+    NODE_ENV: process.env.NODE_ENV,
+    ML_SERVICE_URL: process.env.ML_SERVICE_URL,
+    ML_MOCK_FALLBACK: process.env.ML_MOCK_FALLBACK,
+  };
+  process.env.NODE_ENV = "production";
+  delete process.env.ML_SERVICE_URL;
+  process.env.ML_MOCK_FALLBACK = "true";
+
+  const aiPath = require.resolve("../src/services/ai.service");
+  delete require.cache[aiPath];
+  const ai = require(aiPath);
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "leafwise-demo-"));
+  const imagePath = path.join(tempDir, "leaf.png");
+  await fs.writeFile(imagePath, Buffer.from("demo-image"));
+
+  try {
+    const result = await ai.predict(imagePath);
+    assert.equal(ai.MODE, "mock");
+    assert.equal(typeof result.label, "string");
+    assert.equal(typeof result.confidence, "number");
+  } finally {
+    for (const [key, value] of Object.entries(previous)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+    delete require.cache[aiPath];
+    await fs.rm(tempDir, { recursive: true, force: true });
   }
 });
 

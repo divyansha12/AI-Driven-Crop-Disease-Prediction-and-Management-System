@@ -4,8 +4,7 @@ const diseases = require("../../prisma/data/diseases");
 
 const labels = diseases.map((disease) => disease.name);
 const mlServiceUrl = process.env.ML_SERVICE_URL?.replace(/\/+$/, "");
-const isDevelopment = process.env.NODE_ENV !== "production";
-const allowMockFallback = process.env.ML_MOCK_FALLBACK !== "false";
+const allowMockFallback = process.env.ML_MOCK_FALLBACK === "true";
 const aiServiceTimeoutMs = Number(process.env.ML_SERVICE_TIMEOUT_MS) || 15000;
 
 async function mockPredict(imagePath) {
@@ -93,11 +92,8 @@ async function realPredict(imagePath) {
 
 exports.predict = async (imagePath) => {
   if (!mlServiceUrl) {
-    if (!isDevelopment) {
-      throw predictionError("AI service is not configured");
-    }
     if (!allowMockFallback) {
-      throw predictionError("Real AI service is not configured");
+      throw predictionError("AI service is not configured");
     }
     exports.MODE = "mock";
     return mockPredict(imagePath);
@@ -108,7 +104,6 @@ exports.predict = async (imagePath) => {
     return await realPredict(imagePath);
   } catch (error) {
     if (
-      isDevelopment &&
       allowMockFallback &&
       error.message === "AI service is unavailable"
     ) {

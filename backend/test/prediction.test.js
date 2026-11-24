@@ -1,5 +1,6 @@
 process.env.DATABASE_URL = "postgresql://localhost:5432/test";
 process.env.JWT_SECRET = "test-secret-that-is-at-least-32-characters-long";
+process.env.ML_MOCK_FALLBACK = "true";
 
 const assert = require("node:assert/strict");
 const fs = require("node:fs/promises");
